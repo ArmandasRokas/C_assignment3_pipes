@@ -27,6 +27,7 @@ int main(){
 	setSegmentIntoMatrix(matrix, 1,7,5,6);
 	setSegmentIntoMatrix(matrix, 5,5,9,3);
 	setSegmentIntoMatrix(matrix, 6,3,8,2);
+	setSegmentIntoMatrix(matrix, 13,7,15,6);
 	printMatrix(matrix);
 
 	printf("Pipe liters  9,6,12,8: %d \n",returnPipeLiters(matrix, 9,6,12,8));
@@ -34,6 +35,7 @@ int main(){
 	printf("Pipe liters  5,5,9,3: %d \n",returnPipeLiters(matrix, 5,5,9,3));
 	printf("Pipe liters  1,7,5,6: %d \n",returnPipeLiters(matrix, 1,7,5,6));
 	printf("Pipe liters  6,3,8,2: %d \n",returnPipeLiters(matrix, 6,3,8,2));
+	printf("Pipe liters  13,7,15,6: %d \n",returnPipeLiters(matrix, 13,7,15,6));
 
 	scanf("%d", &numInputs);
 
