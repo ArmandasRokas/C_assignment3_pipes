@@ -19,6 +19,7 @@ void printMatrix(int** matrix);
 void setSegmentIntoMatrix(int ** matrix, segment * s);
 int returnPipeLiters(int ** matrix, segment* s);
 void sortSegments(segment *segments, int inputs);
+void init_segments(segment * segments, int n);
 
 int main(){
 	int numInputs;
@@ -30,7 +31,26 @@ int main(){
 	segment * sorted_segments = (segment *) malloc(numInputs* sizeof(segment));
 
 	// initializing segments
-	for(int i = 0; i < numInputs; i++) {
+	init_segments(segments, numInputs);
+	// Makes a copy of the array to keep the original sequence of segments
+	for(int i = 0; i < numInputs; i++){
+		sorted_segments[i] = segments[i];
+	}
+	sortSegments(sorted_segments, numInputs);
+
+	for(int i = 0; i < numInputs; i++){
+		setSegmentIntoMatrix(matrix,  &sorted_segments[i]);
+	}
+
+	for(int i = 0; i < numInputs; i++){
+		printf("%d\n", returnPipeLiters(matrix, &segments[i]));
+	}
+
+	return 0;
+}
+
+void init_segments(segment * segments, int n){
+	for(int i = 0; i < n; i++) {
 		int startx;
 		int starty;
 		int endx;
@@ -50,22 +70,9 @@ int main(){
 		}
 		segments[i] = *temp;
 	}
-	// Makes a copy of the array to keep the original sequence of segments
-	for(int i = 0; i < numInputs; i++){
-		sorted_segments[i] = segments[i];
-	}
-	sortSegments(sorted_segments, numInputs);
-
-	for(int i = 0; i < numInputs; i++){
-		setSegmentIntoMatrix(matrix,  &sorted_segments[i]);
-	}
-
-	for(int i = 0; i < numInputs; i++){
-		printf("%d\n", returnPipeLiters(matrix, &segments[i]));
-	}
-
-	return 0;
 }
+
+
 /**************************************************************
  *  Insertion sort
  *  It sorts a segments array in the way that the segment
@@ -125,14 +132,13 @@ void setSegmentIntoMatrix(int ** matrix, segment * s){
 			matrix[i][j] = 0;
 		}
 	}
-	// count current pipe value
+	// calculate total value by the end of segment
 	int totalValue = 0;
 	if (matrix[s->highestPoint][s->pipe_X_value] == 1){
 		totalValue++; // add 1 to current value if rain drops above the pipe. So it gives correct value to other segments below that pipe.
 	}
-	for(int i = s->start.x; i<s->end.x; i++){
-		totalValue += matrix[s->highestPoint][i];
-	}
+	totalValue += returnPipeLiters(matrix, s);
+
 	// set pipe value to the bottom
 	for(int i = s->highestPoint-1; i>=0; i--){
 		matrix[i][s->pipe_X_value] = totalValue;
