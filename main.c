@@ -179,8 +179,7 @@ Input:
  16
  0
 Ideas for fix:
- 1.find the slope ratio
- Thus how many x per one y
+ 1.find the slope ratio, i.e. how many x per one y
  y2-y1 = x2-x1
  F.eks. 1,9 and 17,1 has a ratio 2. per 2 x, 1 y decreasing.
  2. Change setSegmentIntoMatrix that insert 0`s using the calculated ratio
