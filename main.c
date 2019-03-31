@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <malloc.h>
-#define MATRIX_SIZE 20
+#define MATRIX_SIZE 14000
 
 typedef struct{
     int x;
@@ -10,36 +10,24 @@ typedef struct{
 typedef struct{
     coordinate start;
     coordinate end;
+    int highestPoint;
+    int pipe_X_value;
 } segment;
 void printSegments(segment * segments, int n);
 int ** initMatrix();
-int calcWaterLiters(segment param, segment *segments, int n);
 void printMatrix(int** matrix);
-void setSegmentIntoMatrix(int ** matrix, int x1, int y1, int x2, int y2);
-int returnPipeLiters(int ** matrix, int x1, int y1, int x2, int y2);
+void setSegmentIntoMatrix(int ** matrix, segment * s);
+int returnPipeLiters(int ** matrix, segment* s);
+void sortSegments(segment *segments, int inputs);
 
 int main(){
 	int numInputs;
-
 	int** matrix = initMatrix();
-	setSegmentIntoMatrix(matrix, 9,6,12,8);
-	setSegmentIntoMatrix(matrix, 3,8,7,7);
-	setSegmentIntoMatrix(matrix, 1,7,5,6);
-	setSegmentIntoMatrix(matrix, 5,5,9,3);
-	setSegmentIntoMatrix(matrix, 6,3,8,2);
-	setSegmentIntoMatrix(matrix, 13,7,15,6);
-	printMatrix(matrix);
-
-	printf("Pipe liters  9,6,12,8: %d \n",returnPipeLiters(matrix, 9,6,12,8));
-	printf("Pipe liters  3,8,7,7: %d \n",returnPipeLiters(matrix, 3,8,7,7));
-	printf("Pipe liters  5,5,9,3: %d \n",returnPipeLiters(matrix, 5,5,9,3));
-	printf("Pipe liters  1,7,5,6: %d \n",returnPipeLiters(matrix, 1,7,5,6));
-	printf("Pipe liters  6,3,8,2: %d \n",returnPipeLiters(matrix, 6,3,8,2));
-	printf("Pipe liters  13,7,15,6: %d \n",returnPipeLiters(matrix, 13,7,15,6));
 
 	scanf("%d", &numInputs);
 
 	segment * segments = (segment *) malloc(numInputs* sizeof(segment));
+	segment * sorted_segments = (segment *) malloc(numInputs* sizeof(segment));
 
 	// initializing segments
 	for(int i = 0; i < numInputs; i++) {
@@ -53,33 +41,57 @@ int main(){
 		temp->start.y = starty;
 		temp->end.x = endx;
 		temp->end.y = endy;
+		if(starty > endy){
+			temp->highestPoint = starty;
+			temp->pipe_X_value = endx;
+		} else{
+			temp->highestPoint = endy;
+			temp->pipe_X_value = endy;
+		}
 		segments[i] = *temp;
 	}
-	// sort segments
-
-	// init matrix (segments)
-
-//	printSegments(segments, numInputs);
-
+	// Makes a copy of the array to keep the original sequence of segments
+	for(int i = 0; i < numInputs; i++){
+		sorted_segments[i] = segments[i];
+	}
+	sortSegments(sorted_segments, numInputs);
 
 	for(int i = 0; i < numInputs; i++){
-	    int waterLiters = calcWaterLiters(segments[i], segments, numInputs);
-//	    printf("%d\n", waterLiters);
+		setSegmentIntoMatrix(matrix,  &sorted_segments[i]);
+	}
+
+	for(int i = 0; i < numInputs; i++){
+		printf("%d\n", returnPipeLiters(matrix, &segments[i]));
 	}
 
 	return 0;
 }
-
-int calcWaterLiters(segment currSegment, segment * segments, int n) {
-
-    int liters = currSegment.end.x - currSegment.start.x;
-
-    return liters;
+/**************************************************************
+ *  Insertion sort
+ *  It sorts a segments array in the way that the segment
+ *  with the highest point is the first element.
+ ***************************************************************/
+void sortSegments(segment * segments, int inputs) {
+	int j, i;
+	for(j = 1; j < inputs; j++){
+		segment key = segments[j];
+		i = j-1;
+		while(i>=0 && segments[i].highestPoint < key.highestPoint){
+			segments[i+1] = segments[i];
+			i--;
+		}
+		segments[i+1] = key;
+	}
 }
-
 void printSegments(segment * segments, int n){
     for(int i = 0; i < n; i++){
-        printf("Segment %d: %d %d %d %d \n", i, segments[i].start.x, segments[i].start.y, segments[i].end.x, segments[i].end.y);
+        printf("Segment %d: %d %d %d %d and highestPoint: %d  \n",
+        		i,
+        		segments[i].start.x,
+        		segments[i].start.y,
+        		segments[i].end.x,
+        		segments[i].end.y,
+        		segments[i].highestPoint);
     }
 }
 void printMatrix(int** matrix){
@@ -102,60 +114,41 @@ int** initMatrix(){
 			*values = 1;
 			values++;
  		}
-
-
 		return rows;
 }
 
-void setSegmentIntoMatrix(int ** matrix, int x1, int y1, int x2, int y2){
-	int height;
-	int pipe_X_value;
-	if(y1 > y2){
-		height = y1;
-		pipe_X_value = x2;
-	} else{
-		height = y2;
-		pipe_X_value = x1-1;
-	}
-	// set 0 under segment
-	for(int i = height - 1; i >= 0; i-- ){
-		for(int j = x1; j < x2; j++){
+void setSegmentIntoMatrix(int ** matrix, segment * s){
+	// set 0`s in all fields under segment
+	for(int i = s->highestPoint - 1; i >= 0; i-- ){
+		for(int j = s->start.x; j < s->end.x; j++){
+
 			matrix[i][j] = 0;
 		}
 	}
 	// count current pipe value
 	int totalValue = 0;
-	if (matrix[height][pipe_X_value] == 1){ // maybe  height????
-		totalValue++;
+	if (matrix[s->highestPoint][s->pipe_X_value] == 1){
+		totalValue++; // add 1 to current value if rain drops above the pipe. So it gives correct value to other segments below that pipe.
 	}
-	for(int i = x1; i<x2; i++){
-		totalValue += matrix[height][i];
+	for(int i = s->start.x; i<s->end.x; i++){
+		totalValue += matrix[s->highestPoint][i];
 	}
 	// set pipe value to the bottom
-	for(int i = height-1; i>=0; i--){
-		matrix[i][pipe_X_value] = totalValue;
+	for(int i = s->highestPoint-1; i>=0; i--){
+		matrix[i][s->pipe_X_value] = totalValue;
 	}
-
-
-//	printf("Total value: %d ", totalValue);
-
 }
-int returnPipeLiters(int ** matrix, int x1, int y1, int x2, int y2){
-	int height;
-	if(y1 > y2){
-		height = y1;
-	} else{
-		height = y2;
-	}
+int returnPipeLiters(int ** matrix, segment* s){
 	int totalValue = 0;
-	for(int i = x1; i<x2; i++){
-		totalValue += matrix[height][i];
+	for(int i = s->start.x; i<s->end.x; i++){
+		totalValue += matrix[s->highestPoint][i];
 	}
 	return totalValue;
 }
 
 
 /* Test data
+########Input:######
 6
 13 7 15 6
 3 8 7 7
@@ -163,11 +156,32 @@ int returnPipeLiters(int ** matrix, int x1, int y1, int x2, int y2){
 5 5 9 3
 6 3 8 2
 9 6 12 8
+##Expected & Actual:##
+ 2
+ 4
+ 2
+ 11
+ 0
+ 3
  */
 
+
+///////////// My test case /////
 /*
-3
- 13 7 15 6
-1 7 5 6
-3 8 7 7
+Input:
+2
+1 9 17 1
+11 5 15 6
+ Expected :
+ 16
+ 4
+ Actual :
+ 16
+ 0
+Ideas for fix:
+ 1.find the slope ratio
+ Thus how many x per one y
+ y2-y1 = x2-x1
+ F.eks. 1,9 and 17,1 has a ratio 2. per 2 x, 1 y decreasing.
+ 2. Change setSegmentIntoMatrix that insert 0`s using the calculated ratio
  */
