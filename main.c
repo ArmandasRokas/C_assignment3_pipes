@@ -17,7 +17,7 @@ void printSegments(segment * segments, int n);
 int ** initMatrix();
 void printMatrix(int** matrix);
 void setSegmentIntoMatrix(int ** matrix, segment * s);
-int returnPipeLiters(int ** matrix, segment* s);
+int returnSegmentPipeLiters(int **matrix, segment *s);
 void sortSegments(segment *segments, int inputs);
 void init_segments(segment * segments, int n);
 
@@ -29,9 +29,8 @@ int main(){
 
 	segment * segments = (segment *) malloc(numInputs* sizeof(segment));
 	segment * sorted_segments = (segment *) malloc(numInputs* sizeof(segment));
-
-	// initializing segments
 	init_segments(segments, numInputs);
+
 	// Makes a copy of the array to keep the original sequence of segments
 	for(int i = 0; i < numInputs; i++){
 		sorted_segments[i] = segments[i];
@@ -43,7 +42,7 @@ int main(){
 	}
 
 	for(int i = 0; i < numInputs; i++){
-		printf("%d\n", returnPipeLiters(matrix, &segments[i]));
+		printf("%d\n", returnSegmentPipeLiters(matrix, &segments[i]));
 	}
 
 	return 0;
@@ -137,14 +136,14 @@ void setSegmentIntoMatrix(int ** matrix, segment * s){
 	if (matrix[s->highestPoint][s->pipe_X_value] == 1){
 		totalValue++; // add 1 to current value if rain drops above the pipe. So it gives correct value to other segments below that pipe.
 	}
-	totalValue += returnPipeLiters(matrix, s);
+	totalValue += returnSegmentPipeLiters(matrix, s);
 
 	// set pipe value to the bottom
 	for(int i = s->highestPoint-1; i>=0; i--){
 		matrix[i][s->pipe_X_value] = totalValue;
 	}
 }
-int returnPipeLiters(int ** matrix, segment* s){
+int returnSegmentPipeLiters(int **matrix, segment *s){
 	int totalValue = 0;
 	for(int i = s->start.x; i<s->end.x; i++){
 		totalValue += matrix[s->highestPoint][i];
