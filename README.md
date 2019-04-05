@@ -4,3 +4,6 @@
 ## Slope
   lave en function som returnere y værdi. Den blive beregnet ud fra x o slope. Slope kan være minus eller plus.
   beregn slope
+
+
+\sum_{i=1}^{10} t_i
