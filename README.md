@@ -6,4 +6,4 @@
   beregn slope
 
 
-\sum_{i=1}^{10} t_i
+$\sum_{i=1}^{10} t_i$
