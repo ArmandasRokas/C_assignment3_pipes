@@ -5,4 +5,6 @@
 - lave en function som returnere y værdi. Den blive beregnet ud fra x o slope. Slope kan være minus eller plus.
   beregn slope
 ## Matrix
-- lave flere matrices and edit row list, that point to next matrix, when one ends. 
+- **Documentere** : virker kun med 40000, ellers får jeg Segmentation fault, fordi computer ikke har nok RAMs. Dvs det bliver sugeret af programmet.  
+
+
