@@ -7,5 +7,6 @@
 ## Matrix
 - **Documentere** : virker kun med 40000, ellers får jeg Segmentation fault, fordi computer ikke har nok RAMs. Dvs det bliver sugeret af programmet.  
   - OG hvis jeg laver en metoden som håndtere en række ad gang
+  - OG hvis jeg gemmer i text files?
 
 
