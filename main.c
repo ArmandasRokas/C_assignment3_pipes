@@ -126,16 +126,20 @@ int** initMatrix(){
 		return rows;
 }
 
+void setZerosToRow(int ** matrix, segment * s, int columnNumber){
+    for(int j = s->start.x; j < s->end.x; j++){
+        int * column = *(matrix+columnNumber);
+        //	int value = *(column+j);
+        //	printf("%d", value);
+        //matrix[i][j] = 0;
+        *(column+j) = 0;
+    }
+};
+
 void setSegmentIntoMatrix(int ** matrix, segment * s){
 	// set 0`s in all fields under segment
 	for(int i = s->highestPoint - 1; i >= 0; i-- ){
-		for(int j = s->start.x; j < s->end.x; j++){
-			int * column = *(matrix+i);
-		//	int value = *(column+j);
-		//	printf("%d", value);
-			//matrix[i][j] = 0;
-			*(column+j) = 0;
-		}
+        setZerosToRow(matrix, s, i);
 	}
 	// calculate total value by the end of segment
 	int totalValue = 0;
