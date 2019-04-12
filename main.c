@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <malloc.h>
-#define MATRIX_SIZE 40000
+#include <assert.h>
+
+#define MATRIX_SIZE 60000
 #define TOTAL_MATRIX_SIZE (unsigned long)MATRIX_SIZE*MATRIX_SIZE
 
 typedef struct{
@@ -113,26 +115,68 @@ void printMatrix(int** matrix){
 }
 
 int** initMatrix(){
-		int* values = (int *) malloc(TOTAL_MATRIX_SIZE*sizeof(int));
+		int* values = (int *) malloc(TOTAL_MATRIX_SIZE*sizeof(int)/4);
+        int* values_part2 = (int *) malloc(TOTAL_MATRIX_SIZE*sizeof(int)/4);
+        int* values_part3 = (int *) malloc(TOTAL_MATRIX_SIZE*sizeof(int)/4);
+        int* values_part4 = (int *) malloc(TOTAL_MATRIX_SIZE*sizeof(int)/4);
 		int** rows =(int **) malloc(MATRIX_SIZE*sizeof(int *));
-	    for (int i=0; i<MATRIX_SIZE; ++i)
+	    for (int i=0; i<MATRIX_SIZE/4; ++i)
 		{
 			rows[i] = values + i*MATRIX_SIZE;
 		}
-		for(unsigned long i = 0; i < TOTAL_MATRIX_SIZE; i++){
+        int j = 0;
+        for (int i=MATRIX_SIZE/4; i<MATRIX_SIZE/2; ++i)
+        {
+            rows[i] = values_part2 + j*MATRIX_SIZE;
+            j++;
+        }
+        int p = 0;
+        for (int i=MATRIX_SIZE/2; i<MATRIX_SIZE*3/4; ++i)
+        {
+            rows[i] = values_part3 + p*MATRIX_SIZE;
+            p++;
+        }
+        int s = 0;
+        for (int i=MATRIX_SIZE*3/4; i<MATRIX_SIZE; ++i)
+        {
+            rows[i] = values_part4 + s*MATRIX_SIZE;
+            s++;
+        }
+
+		for(unsigned long i = 0; i < TOTAL_MATRIX_SIZE/4; i++){
 			*values = 1;
 			values++;
  		}
+        for(unsigned long i = 0; i < TOTAL_MATRIX_SIZE/4; i++){
+            *values_part2 = 1;
+            values_part2++;
+        }
+        for(unsigned long i = 0; i < TOTAL_MATRIX_SIZE/4; i++){
+            *values_part3 = 1;
+            values_part3++;
+        }
+        for(unsigned long i = 0; i < TOTAL_MATRIX_SIZE/4; i++){
+            *values_part4 = 1;
+            values_part4++;
+        }
 		return rows;
 }
 
 void setZerosToRow(int ** matrix, segment * s, int columnNumber){
+    int * column = *(matrix+columnNumber);
+    int * element = column + (s->start.x);
     for(int j = s->start.x; j < s->end.x; j++){
-        int * column = *(matrix+columnNumber);
+
         //	int value = *(column+j);
         //	printf("%d", value);
         //matrix[i][j] = 0;
-        *(column+j) = 0;
+        if(element == NULL){
+            printf("Null pointer");
+            exit(1);
+        }
+
+        *element = 0;
+        element++;
     }
 };
 
