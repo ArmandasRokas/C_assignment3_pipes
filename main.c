@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <malloc.h>
-#define MATRIX_SIZE 14000
+#define MATRIX_SIZE 40000
+#define TOTAL_MATRIX_SIZE (unsigned long)MATRIX_SIZE*MATRIX_SIZE
 
 typedef struct{
     int x;
@@ -44,6 +45,8 @@ int main(){
 	for(int i = 0; i < numInputs; i++){
 		printf("%d\n", returnSegmentPipeLiters(matrix, &segments[i]));
 	}
+
+	//printMatrix(matrix);
 
 	return 0;
 }
@@ -110,13 +113,13 @@ void printMatrix(int** matrix){
 }
 
 int** initMatrix(){
-		int* values = (int *) malloc(MATRIX_SIZE*MATRIX_SIZE*sizeof(int));
+		int* values = (int *) malloc(TOTAL_MATRIX_SIZE*sizeof(int));
 		int** rows =(int **) malloc(MATRIX_SIZE*sizeof(int *));
 	    for (int i=0; i<MATRIX_SIZE; ++i)
 		{
 			rows[i] = values + i*MATRIX_SIZE;
 		}
-		for(int i = 0; i < MATRIX_SIZE*MATRIX_SIZE; i++){
+		for(unsigned long i = 0; i < TOTAL_MATRIX_SIZE; i++){
 			*values = 1;
 			values++;
  		}
@@ -127,8 +130,11 @@ void setSegmentIntoMatrix(int ** matrix, segment * s){
 	// set 0`s in all fields under segment
 	for(int i = s->highestPoint - 1; i >= 0; i-- ){
 		for(int j = s->start.x; j < s->end.x; j++){
-
-			matrix[i][j] = 0;
+			int * column = *(matrix+i);
+		//	int value = *(column+j);
+		//	printf("%d", value);
+			//matrix[i][j] = 0;
+			*(column+j) = 0;
 		}
 	}
 	// calculate total value by the end of segment
