@@ -15,7 +15,7 @@ typedef struct{
     coordinate end;
     int highestPoint;
     int pipe_X_value;
-    double slope;
+//    double slope;
 } segment;
 void printSegments(segment * segments, int n);
 int ** initMatrix();
@@ -74,7 +74,7 @@ void init_segments(segment * segments, int n){
 			temp->highestPoint = endy;
 			temp->pipe_X_value = endy;
 		}
-		temp->slope = (double) (endy - starty)/(endx-endy);
+	//	temp->slope = (double) (endy - starty)/(endx-endy);
 
 		segments[i] = *temp;
 	}
@@ -141,7 +141,7 @@ int** initMatrix(){
         }
 		return rows;
 }
-/*
+
 void setZerosToRow(int ** matrix, segment * s, int columnNumber){
     int * column = *(matrix+columnNumber);
     int * element = column + (s->start.x);
@@ -176,8 +176,8 @@ void setSegmentIntoMatrix(int ** matrix, segment * s){
 	for(int i = s->highestPoint-1; i>=0; i--){
 		matrix[i][s->pipe_X_value] = totalValue;
 	}
-}*/
-
+}
+/*
 void setSegmentIntoMatrix(int ** matrix, segment * s){
     // one at the time x column
     int currColumn = s->start.x;
@@ -199,7 +199,7 @@ void setZerosToColumn(int ** matrix, segment * s, int rowNumber, int currColumn)
     }
 }
 
-
+*/
 int returnSegmentPipeLiters(int **matrix, segment *s){
 	int totalValue = 0;
 	for(int i = s->start.x; i<s->end.x; i++){
