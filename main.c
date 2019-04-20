@@ -2,7 +2,7 @@
 #include <malloc.h>
 #include <assert.h>
 
-#define MATRIX_SIZE 60000
+#define MATRIX_SIZE 20
 #define TOTAL_MATRIX_SIZE (unsigned long)MATRIX_SIZE*MATRIX_SIZE
 
 typedef struct{
@@ -15,6 +15,7 @@ typedef struct{
     coordinate end;
     int highestPoint;
     int pipe_X_value;
+    double slope;
 } segment;
 void printSegments(segment * segments, int n);
 int ** initMatrix();
@@ -23,6 +24,7 @@ void setSegmentIntoMatrix(int ** matrix, segment * s);
 int returnSegmentPipeLiters(int **matrix, segment *s);
 void sortSegments(segment *segments, int inputs);
 void init_segments(segment * segments, int n);
+void setZerosToColumn(int ** matrix, segment * s, int rowNumber,int currColumn);
 
 int main(){
 	int numInputs;
@@ -48,7 +50,7 @@ int main(){
 		printf("%d\n", returnSegmentPipeLiters(matrix, &segments[i]));
 	}
 
-	//printMatrix(matrix);
+	printMatrix(matrix);
 
 	return 0;
 }
@@ -72,6 +74,8 @@ void init_segments(segment * segments, int n){
 			temp->highestPoint = endy;
 			temp->pipe_X_value = endy;
 		}
+		temp->slope = (double) (endy - starty)/(endx-endy);
+
 		segments[i] = *temp;
 	}
 }
@@ -115,53 +119,29 @@ void printMatrix(int** matrix){
 }
 
 int** initMatrix(){
-		int* values = (int *) malloc(TOTAL_MATRIX_SIZE*sizeof(int)/4);
-        int* values_part2 = (int *) malloc(TOTAL_MATRIX_SIZE*sizeof(int)/4);
-        int* values_part3 = (int *) malloc(TOTAL_MATRIX_SIZE*sizeof(int)/4);
-        int* values_part4 = (int *) malloc(TOTAL_MATRIX_SIZE*sizeof(int)/4);
-		int** rows =(int **) malloc(MATRIX_SIZE*sizeof(int *));
-	    for (int i=0; i<MATRIX_SIZE/4; ++i)
-		{
-			rows[i] = values + i*MATRIX_SIZE;
-		}
-        int j = 0;
-        for (int i=MATRIX_SIZE/4; i<MATRIX_SIZE/2; ++i)
-        {
-            rows[i] = values_part2 + j*MATRIX_SIZE;
-            j++;
-        }
-        int p = 0;
-        for (int i=MATRIX_SIZE/2; i<MATRIX_SIZE*3/4; ++i)
-        {
-            rows[i] = values_part3 + p*MATRIX_SIZE;
-            p++;
-        }
-        int s = 0;
-        for (int i=MATRIX_SIZE*3/4; i<MATRIX_SIZE; ++i)
-        {
-            rows[i] = values_part4 + s*MATRIX_SIZE;
-            s++;
-        }
 
-		for(unsigned long i = 0; i < TOTAL_MATRIX_SIZE/4; i++){
-			*values = 1;
-			values++;
- 		}
-        for(unsigned long i = 0; i < TOTAL_MATRIX_SIZE/4; i++){
-            *values_part2 = 1;
-            values_part2++;
-        }
-        for(unsigned long i = 0; i < TOTAL_MATRIX_SIZE/4; i++){
-            *values_part3 = 1;
-            values_part3++;
-        }
-        for(unsigned long i = 0; i < TOTAL_MATRIX_SIZE/4; i++){
-            *values_part4 = 1;
-            values_part4++;
+
+		int** rows =(int **) malloc(MATRIX_SIZE*sizeof(int *));
+	    for (int i=0; i<MATRIX_SIZE; ++i)
+		{
+			rows[i] = (int *) malloc(MATRIX_SIZE* sizeof(int));
+			if(rows[i] == NULL){
+				printf("Can not allocate memory\n");
+				exit(1);
+			}
+		}
+
+        for(int i = 0; i < MATRIX_SIZE; i++){
+			int * column = *(rows+i);
+        	for(int j = 0; j < MATRIX_SIZE; j++ ){
+        		*(column+j) =1;
+        	}
+
+
         }
 		return rows;
 }
-
+/*
 void setZerosToRow(int ** matrix, segment * s, int columnNumber){
     int * column = *(matrix+columnNumber);
     int * element = column + (s->start.x);
@@ -196,7 +176,30 @@ void setSegmentIntoMatrix(int ** matrix, segment * s){
 	for(int i = s->highestPoint-1; i>=0; i--){
 		matrix[i][s->pipe_X_value] = totalValue;
 	}
+}*/
+
+void setSegmentIntoMatrix(int ** matrix, segment * s){
+    // one at the time x column
+    int currColumn = s->start.x;
+
+    for(int j = s->start.x; j < s->end.x; j++) {
+
+        int rowNumber = s->start.y + ((currColumn - s->start.x) *s->slope);
+
+        setZerosToColumn(matrix, s, rowNumber, currColumn);
+
+        currColumn++;
+        //mark the column. with y
+    }
 }
+
+void setZerosToColumn(int ** matrix, segment * s, int rowNumber, int currColumn){
+    for (int i = rowNumber - 1; i >= 0; i--){
+        matrix[i][currColumn] = 0;
+    }
+}
+
+
 int returnSegmentPipeLiters(int **matrix, segment *s){
 	int totalValue = 0;
 	for(int i = s->start.x; i<s->end.x; i++){
