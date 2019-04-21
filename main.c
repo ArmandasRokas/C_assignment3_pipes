@@ -5,6 +5,8 @@
 #define MATRIX_SIZE 20
 #define TOTAL_MATRIX_SIZE (unsigned long)MATRIX_SIZE*MATRIX_SIZE
 #define ARRAY_SIZE 10000000
+#define DEBUG 1
+
 
 typedef struct{
     int x;
@@ -18,6 +20,7 @@ typedef struct{
     int highestPoint;
     int pipe_X_value;
     int pipe_liters;
+    int isSetOnArray;
 //    double slope;
 } segment;
 void printSegments(segment * segments, int n);
@@ -28,7 +31,7 @@ int returnSegmentPipeLiters(int **matrix, segment *s);
 void sortSegments(segment *segments, int inputs);
 void init_segments(segment * segments, int n);
 void setZerosToColumn(int ** matrix, segment * s, int rowNumber,int currColumn);
-void setSegmentIntoArray(int * array, segment * s);
+void setSegmentIntoArray(int * array, segment * s, int numInputs);
 void printSegmentsArray(int * array);
 int returnSegmentPipeLitersInArray(int * array, segment *s);
 
@@ -38,10 +41,6 @@ int main(){
 	int numInputs;
 //	int** matrix = initMatrix();
 
-	int * array = (int *) malloc(ARRAY_SIZE* sizeof(int));
-	for(int i = 0; i< ARRAY_SIZE; i++){
-		array[i] = 1;
-	}
 
 	scanf("%d", &numInputs);
 
@@ -55,8 +54,36 @@ int main(){
 	}
 	sortSegments(segments, numInputs);
 
+//	calculateSegmentsPipes(segments);
+	int * array = (int *) malloc(ARRAY_SIZE* sizeof(int));
+	for(int i = 0; i< ARRAY_SIZE; i++){
+		array[i] = 1;
+	}
+
 	for(int i = 0; i < numInputs; i++){
-		setSegmentIntoArray(array, &segments[i]);
+		for(int j = i+1; j < numInputs; j++) {
+			if (segments[i].end.y < segments[j].start.y && segments[i].end.x > segments[j].start.x
+			&& segments[i].start.x < segments[j].start.x) {
+				if (segments[j].isSetOnArray == 0) {
+					#if DEBUG
+							printf("Special case. Segment j: %d %d %d %d \n",
+									segments[j].start.x,
+								   segments[j].start.y,
+								   segments[j].end.x,
+								   segments[j].end.y);
+							printf("Segment i: %d %d %d %d \n",
+								   segments[i].start.x,
+								   segments[i].start.y,
+								   segments[i].end.x,
+								   segments[i].end.y);
+					#endif
+					setSegmentIntoArray(array, &segments[j], numInputs);
+				}
+			}
+		}
+		if(segments[i].isSetOnArray == 0){
+			setSegmentIntoArray(array, &segments[i], numInputs);
+		}
 		//setSegmentIntoMatrix(matrix,  &sorted_segments[i]);
 	}
 
@@ -102,10 +129,11 @@ void init_segments(segment * segments, int n){
 			temp->pipe_X_value = endx;
 		} else{
 			temp->highestPoint = endy;
-			temp->pipe_X_value = endy;
+			temp->pipe_X_value = startx-1;
 		}
 	//	temp->slope = (double) (endy - starty)/(endx-endy);
 		temp->index = i;
+		temp->isSetOnArray = 0;
 		segments[i] = *temp;
 	}
 }
@@ -171,7 +199,7 @@ int** initMatrix(){
         }
 		return rows;
 }
-
+/*
 void setZerosToRow(int ** matrix, segment * s, int columnNumber){
     int * column = *(matrix+columnNumber);
     int * element = column + (s->start.x);
@@ -189,7 +217,9 @@ void setZerosToRow(int ** matrix, segment * s, int columnNumber){
         element++;
     }
 };
+*/
 
+/*
 void setSegmentIntoMatrix(int ** matrix, segment * s){
 	// set 0`s in all fields under segment
 	for(int i = s->highestPoint - 1; i >= 0; i-- ){
@@ -207,6 +237,7 @@ void setSegmentIntoMatrix(int ** matrix, segment * s){
 		matrix[i][s->pipe_X_value] = totalValue;
 	}
 }
+ */
 /*
 void setSegmentIntoMatrix(int ** matrix, segment * s){
     // one at the time x column
@@ -238,12 +269,13 @@ int returnSegmentPipeLiters(int **matrix, segment *s){
 	return totalValue;
 }
 
-void setSegmentIntoArray(int * array, segment * s){
+void setSegmentIntoArray(int * array, segment * s, int numInputs){
 	array[s->pipe_X_value] = returnSegmentPipeLitersInArray(array, s);
 	for(int i = s->start.x; i < s->end.x; i++){
 		//*(array + i) = 0;
 		array[i] = 0;
 	}
+	s->isSetOnArray = 1;
 
 }
 void printSegmentsArray(int * array){
