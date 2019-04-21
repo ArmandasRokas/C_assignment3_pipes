@@ -37,6 +37,8 @@ int returnSegmentPipeLitersInArray(int * array, segment *s);
 
 void unsortSegments(segment *segments, int inputs);
 
+void calculateSegmentsPipes(segment *segments, int numInputs);
+
 int main(){
 	int numInputs;
 //	int** matrix = initMatrix();
@@ -54,38 +56,7 @@ int main(){
 	}
 	sortSegments(segments, numInputs);
 
-//	calculateSegmentsPipes(segments);
-	int * array = (int *) malloc(ARRAY_SIZE* sizeof(int));
-	for(int i = 0; i< ARRAY_SIZE; i++){
-		array[i] = 1;
-	}
-
-	for(int i = 0; i < numInputs; i++){
-		for(int j = i+1; j < numInputs; j++) {
-			if (segments[i].end.y < segments[j].start.y && segments[i].end.x > segments[j].start.x
-			&& segments[i].start.x < segments[j].start.x) {
-				if (segments[j].isSetOnArray == 0) {
-					#if DEBUG
-							printf("Special case. Segment j: %d %d %d %d \n",
-									segments[j].start.x,
-								   segments[j].start.y,
-								   segments[j].end.x,
-								   segments[j].end.y);
-							printf("Segment i: %d %d %d %d \n",
-								   segments[i].start.x,
-								   segments[i].start.y,
-								   segments[i].end.x,
-								   segments[i].end.y);
-					#endif
-					setSegmentIntoArray(array, &segments[j], numInputs);
-				}
-			}
-		}
-		if(segments[i].isSetOnArray == 0){
-			setSegmentIntoArray(array, &segments[i], numInputs);
-		}
-		//setSegmentIntoMatrix(matrix,  &sorted_segments[i]);
-	}
+	calculateSegmentsPipes(segments, numInputs);
 
 	unsortSegments(segments, numInputs);
 
@@ -97,6 +68,40 @@ int main(){
 	//printMatrix(matrix);
 
 	return 0;
+}
+
+void calculateSegmentsPipes(segment *segments, int numInputs) {
+	int * array = (int *) malloc(ARRAY_SIZE* sizeof(int));
+	for(int i = 0; i< ARRAY_SIZE; i++){
+		array[i] = 1;
+	}
+
+	for(int i = 0; i < numInputs; i++){
+		for(int j = i+1; j < numInputs; j++) {
+			if (segments[i].end.y < segments[j].start.y && segments[i].end.x > segments[j].start.x
+				&& segments[i].start.x < segments[j].start.x) {
+				if (segments[j].isSetOnArray == 0) {
+					#if DEBUG
+					printf("Special case. Segment j: %d %d %d %d \n",
+						   segments[j].start.x,
+						   segments[j].start.y,
+						   segments[j].end.x,
+						   segments[j].end.y);
+					printf("Segment i: %d %d %d %d \n",
+						   segments[i].start.x,
+						   segments[i].start.y,
+						   segments[i].end.x,
+						   segments[i].end.y);
+					#endif
+					setSegmentIntoArray(array, &segments[j], numInputs);
+				}
+			}
+		}
+		if(segments[i].isSetOnArray == 0){
+			setSegmentIntoArray(array, &segments[i], numInputs);
+		}
+		//setSegmentIntoMatrix(matrix,  &sorted_segments[i]);
+	}
 }
 
 void unsortSegments(segment *segments, int inputs) {
