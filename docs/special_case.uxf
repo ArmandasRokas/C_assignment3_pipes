@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>40</x>
+      <y>210</y>
+      <w>210</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>lt=()-()
+A
+r1=xA1, yA1
+m2=xA2, yA2</panel_attributes>
+    <additional_attributes>10.0;10.0;190.0;140.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>210</x>
+      <y>250</y>
+      <w>220</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=()-()
+B
+m1=xB1,yB1 
+r2=xB2, yB2</panel_attributes>
+    <additional_attributes>10.0;50.0;200.0;20.0</additional_attributes>
+  </element>
+</diagram>

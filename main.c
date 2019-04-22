@@ -1,23 +1,45 @@
-#include "segment.h"
+#include <stdio.h>
+#include <malloc.h>
+#include <assert.h>
+#define SIZE_OF_X_AXIS 1000000
+#define DEBUG 0
+
+typedef struct{
+	int x;
+	int y;
+} coordinate;
+
+typedef struct{
+	int index;
+	coordinate start;
+	coordinate end;
+	int highestPoint;
+	int pipe_X_value;
+	int pipe_liters;
+	int isSetOnArray;
+} segment;
+
+void printSegments(segment * segments, int n);
+void sortSegments(segment *segments, int inputs);
+void init_segments(segment * segments, int n);
+void setSegmentIntoArray(int * array, segment * s);
+void printSegmentsArray(int * array);
+int returnSegmentPipeLitersInArray(int * array, segment *s);
+void unsortSegments(segment *segments, int inputs);
+void calculateSegmentsPipes(segment *segments, int numInputs);
+
 
 int main(){
 	int numInputs;
-
 	scanf("%d", &numInputs);
-
 	segment * segments = (segment *) malloc(numInputs* sizeof(segment));
 	init_segments(segments, numInputs);
-
 	sortSegments(segments, numInputs);
-
 	calculateSegmentsPipes(segments, numInputs);
-
 	unsortSegments(segments, numInputs);
-
 	for(int i = 0; i < numInputs; i++){
 		printf("%d\n", segments[i].pipe_liters);
 	}
-
 	return 0;
 }
 
@@ -29,6 +51,10 @@ void init_segments(segment * segments, int n){
 		int endy;
 		scanf("%d %d %d %d", &startx, &starty, &endx, &endy);
 		segment * temp = (segment *) malloc(sizeof(segment));
+		if(temp == NULL){
+			printf("Could not allocate memory for segment\n");
+			exit(1);
+		}
 		temp->start.x = startx;
 		temp->start.y = starty;
 		temp->end.x = endx;
@@ -79,14 +105,14 @@ void unsortSegments(segment *segments, int inputs) {
 }
 
 void calculateSegmentsPipes(segment *segments, int numInputs) {
-	int * array = (int *) malloc(ARRAY_SIZE* sizeof(int));
-	for(int i = 0; i< ARRAY_SIZE; i++){
-		array[i] = 1;
+	int * currWaterFall_Xaxis = (int *) malloc(SIZE_OF_X_AXIS* sizeof(int));
+	for(int i = 0; i< SIZE_OF_X_AXIS; i++){
+		currWaterFall_Xaxis[i] = 1;
 	}
 
 	for(int i = 0; i < numInputs; i++){
 
-		// Checks for a special case where
+		// Search for the special case where not segment with the highest point should be added first
 		for(int j = i+1; j < numInputs; j++) {
 			if (segments[i].end.y < segments[j].start.y
 				&& segments[i].end.x > segments[j].start.x
@@ -106,21 +132,23 @@ void calculateSegmentsPipes(segment *segments, int numInputs) {
 						   segments[j].end.x,
 						   segments[j].end.y);
 					#endif
-					setSegmentIntoArray(array, &segments[j], numInputs);
+					setSegmentIntoArray(currWaterFall_Xaxis, &segments[j]);
 				}
 			}
 		}
 		if(segments[i].isSetOnArray == 0){
-			setSegmentIntoArray(array, &segments[i], numInputs);
+			setSegmentIntoArray(currWaterFall_Xaxis, &segments[i]);
 		}
+		#if DEBUG
+		printSegmentsArray(currWaterFall_Xaxis);
+		#endif
 	}
 }
 
-void setSegmentIntoArray(int * array, segment * s, int numInputs){
+void setSegmentIntoArray(int * array, segment * s){
 	array[s->pipe_X_value] = returnSegmentPipeLitersInArray(array, s);
 	for(int i = s->start.x; i < s->end.x; i++){
 		*(array + i) = 0;
-		//array[i] = 0;
 	}
 	s->isSetOnArray = 1;
 
@@ -131,17 +159,15 @@ int returnSegmentPipeLitersInArray(int * array, segment *s){
 		totalValue += array[i];
 	}
 	s->pipe_liters = totalValue;
-
-	if (array[s->pipe_X_value] == 1){
-		totalValue++; // add 1 to current value if rain drops above the pipe. So it gives correct value to other segments below that pipe.
-	}
+	totalValue += array[s->pipe_X_value];
 	return totalValue;
 }
 
 void printSegmentsArray(int * array){
-	for(int i = 0; i < ARRAY_SIZE; i++){
+	for(int i = 0; i < SIZE_OF_X_AXIS; i++){
 		printf("%d ", *(array+i));
 	}
+	printf("\n");
 }
 
 void printSegments(segment * segments, int n){

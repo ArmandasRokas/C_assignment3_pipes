@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <assert.h>
-
-#define ARRAY_SIZE 10000000
-#define DEBUG 1
+#define ARRAY_SIZE 1000000
+#define DEBUG 0
 
 typedef struct{
     int x;

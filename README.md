@@ -1,3 +1,3 @@
 ## Questions 
-- Skal man dokumentere sin arbejde?
-- Hvis algoritmen fejler på nogen af din test cases? Betyder det at jeg ikke kan få 12?
+- Skal man have flow diagram? Jeg synes at coden forklarer bare ideen bag algortimen. Flow diagram skal gøre det bare endnu mere forvirrende
+
