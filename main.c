@@ -27,6 +27,7 @@ void printSegmentsArray(int * array);
 int returnSegmentPipeLitersInArray(int * array, segment *s);
 void unsortSegments(segment *segments, int inputs);
 void calculateSegmentsPipes(segment *segments, int numInputs);
+void printSegmentsPipeFlow(segment * segments, int numInputs);
 
 
 int main(){
@@ -37,10 +38,9 @@ int main(){
 	sortSegments(segments, numInputs);
 	calculateSegmentsPipes(segments, numInputs);
 	unsortSegments(segments, numInputs);
-	for(int i = 0; i < numInputs; i++){
-		printf("%d\n", segments[i].pipe_liters);
-	}
-	return 0;
+    printSegmentsPipeFlow(segments, numInputs);
+
+    return 0;
 }
 
 void init_segments(segment * segments, int n){
@@ -168,6 +168,12 @@ void printSegmentsArray(int * array){
 		printf("%d ", *(array+i));
 	}
 	printf("\n");
+}
+
+void printSegmentsPipeFlow(segment * segments, int numInputs){
+    for(int i = 0; i < numInputs; i++){
+        printf("%d\n", segments[i].pipe_liters);
+    }
 }
 
 void printSegments(segment * segments, int n){

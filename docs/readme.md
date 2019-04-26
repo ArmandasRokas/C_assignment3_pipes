@@ -47,9 +47,15 @@ This document describes the implementation of "Piping system for roofs" solution
 
 The main function starts by asking for the number of segments to be inserted. Then initializing an array of segments, which length equals to the inserted number by using `malloc` function.  
 
-Next, there are called `init_segments`,  `sort_Segments`, `calculateSegmentsPipes` `unsortSegements  ` functions respectively with corresponding arguments. 
+Next, there are called `init_segments`,  `sort_Segments`, `calculateSegmentsPipes` `unsortSegements  ` functions respectively with corresponding arguments.  
 
 Finally, the main function prints how much water is down from each segment of the roof using `printf` function.  
+
+The flow chart in *Figure 1* tries to illustrate that.
+
+![main](main.bmp)
+
+*Figure 1*
 
 ```C
 int main(){
@@ -60,9 +66,8 @@ int main(){
 	sortSegments(segments, numInputs);
 	calculateSegmentsPipes(segments, numInputs);
 	unsortSegments(segments, numInputs);
-	for(int i = 0; i < numInputs; i++){
-		printf("%d\n", segments[i].pipe_liters);
-	}
+    printSegmentsPipeFlow(segments, numInputs);
+
 	return 0;
 }
 ```
@@ -71,9 +76,11 @@ int main(){
 
 The function `init_segments` loops n times, where n equals to the number of segments.  Each time should be inserted four values representing coordinates of the right end of segment and the left end of segment. Then everything is set to corresponding segment `struct` and that segment is inserted to the array of segments.  
 
-In addition, the function calculates the `highest point` and the `pipe x value` too. The `highest point` means that it finds which of these two `y`  values, i.e the left end of segment or the right end of segment , is higher. The highest point will be used later for sorting segments. The `pipe x value` is set to be at that end, where `y` is lower. The flow diagram below tries to illustrate that.  
+In addition, the function calculates the `highest point` and the `pipe x value` too. The `highest point` means that it finds which of these two `y`  values, i.e the left end of segment or the right end of segment , is higher. The highest point will be used later for sorting segments. The `pipe x value` is set to be at that end, where `y` is lower. The flow diagram in *Figure 2* tries to illustrate that.  
 
 ![init_segments](init_segments.bmp)
+
+*Figure 2*
 
   ```C
 void init_segments(segment * segments, int n){
@@ -141,7 +148,11 @@ First there is inserting the calculated total sum of the segment, where is `pipe
 
 The algorithm is separated into three functions `calculateSegmentsPipes`, `returnSegmentsPipeLitersInArray`and `setSegmentIntoArray`. 
 
-The `calculateSegmentsPipes` firstly initialize the mentioned array and basically calls the `setSegmentsIntoArray` function for each segment. The tricky part here is that there is another `for loop` here, which is used to find the special case, where the algorithm should behave differently, i.e insert one of the below placed segments before the current above placed segment. 
+The `calculateSegmentsPipes` firstly initialize the mentioned array and basically calls the `setSegmentsIntoArray` function for each segment. The tricky part here is that there is another `for loop` here, which is used to find the special case, where the algorithm should behave differently, i.e insert one of the below placed segments before the current above placed segment.  The flow diagram in *Figure 3* tries to illustrate that. 
+
+![calculate_flow](calculate_flow.bmp)
+
+*Figure 3*
 
 The `special case` occurs when the above placed segment is depend on the below placed segment.  The figure below shows that case. Here B should be put into the array before, because A depends on B by meaning that there should be collected more water on A which is dropped from B. So by inserting A first and B after it will give wrong answer that why B should be inserted first. The case is when: 
 
@@ -154,6 +165,8 @@ xA1 < xB1
 
 
 ![special_case](special_case.bmp)
+
+*Figure 4*
 
 The `returnSegmentsPipeLitersInArray` is used to find the total collected water in the segment, which will be used in the `currWaterFall_Xaxis` array. In addition, the function sets the calculated `pipe_liters` value to the current segment, so it can be used to print at the end of program. 
 
